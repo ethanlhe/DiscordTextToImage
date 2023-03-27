@@ -9,7 +9,7 @@ import time
 import asyncio
 
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
 
 cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
