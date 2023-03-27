@@ -12,6 +12,6 @@ async def main():
     await bot.load_extension('prompt')
 
 asyncio.run(main())
-bot.run('MTAxMzIzMjQ5ODI0OTA0Mzk2OQ.GaUFlM.PVK86rFRcGOVnSU-ckP_RzqG99f6LwNHmQrZ1k')
+bot.run('MTAxMzIzMjQ5ODI0OTA0Mzk2OQ.GfBz_V.gXxdl_YLck377QnfgjPXnUEiDzBt6j5TL2LJDk')
 
 
