@@ -1,0 +1,6 @@
+git+https://github.com/fchollet/stable-diffusion-tensorflow 
+tensorflow_addons ftfy
+nextcord
+git+https://github.com/Rapptz/discord.py
+regex
+tqdm
