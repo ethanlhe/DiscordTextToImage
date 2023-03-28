@@ -58,7 +58,7 @@ class Prompt(commands.Cog):
             self.prompt = prompt
             self.change_button_state("disable", "left")
         
-        @discord.ui.button(label="⬅️", style=discord.ButtonStyle.grey, custom_id="left")
+        @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple, custom_id="left")
         async def left(self, interaction, button):
             self.number -= 1
             if self.number == 0:
@@ -67,7 +67,7 @@ class Prompt(commands.Cog):
             file, embed = make_embed(self.images, self.number, self.prompt)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
-        @discord.ui.button(label="➡️", style=discord.ButtonStyle.grey, custom_id="right")
+        @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple, custom_id="right")
         async def right(self, interaction, button):
             self.number += 1
             if self.number == len(self.images)-1:
