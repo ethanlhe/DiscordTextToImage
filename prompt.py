@@ -7,6 +7,7 @@ from stable_diffusion_tf.stable_diffusion import Text2Image
 from PIL import Image
 import time
 import asyncio
+import functools
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
@@ -83,7 +84,7 @@ class Prompt(commands.Cog):
                     elif operation == "disable":
                         button.disabled = True    
 
-    async def gen_images(self, prompt):   
+    def gen_images(self, prompt):   
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -102,11 +103,18 @@ class Prompt(commands.Cog):
         #    await ctx.message.reply("Don't use this bot in DM's, use it in the server please!")
         #    return
         await interaction.response.defer(thinking=True)
-        images = await self.gen_images(prompt)
+        loop = asyncio.get_running_loop()
+        images = await loop.run_in_executor(None, functools.partial(
+            self.gen_images, prompt = prompt
+            ))
+        #images = await self.gen_images(prompt)
         view = self.Menu(images, prompt)
         file, embed = make_embed(images, 0, prompt)
         await interaction.followup.send(embed=embed, file=file, view=view)
 
 async def setup(bot):
-    await bot.add_cog(Prompt(bot), guilds=[discord.Object(id=975524755098714153), discord.Object(id=999419811010453556)])
+    await bot.add_cog(Prompt(bot), guilds=[discord.Object(id=975524755098714153), 
+                                            discord.Object(id=999419811010453556), 
+                                            discord.Object(id=937936836523884566),
+                                            discord.Object(id=812413283738058802)])
 

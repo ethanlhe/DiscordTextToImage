@@ -16,5 +16,3 @@ async def main():
 
 asyncio.run(main())
 bot.run('MTAxMzIzMjQ5ODI0OTA0Mzk2OQ.GfBz_V.gXxdl_YLck377QnfgjPXnUEiDzBt6j5TL2LJDk')
-
-
