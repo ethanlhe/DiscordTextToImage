@@ -111,6 +111,10 @@ class Prompt(commands.Cog):
         view = self.Menu(images, prompt)
         file, embed = make_embed(images, 0, prompt)
         await interaction.followup.send(embed=embed, file=file, view=view)
+    
+    @app_commands.command(name="ping", description="testing if bot responds")
+    async def ping(self, interaction):
+        await interaction.response.send_message("pong")
 
 async def setup(bot):
     await bot.add_cog(Prompt(bot), guilds=[discord.Object(id=975524755098714153), 
