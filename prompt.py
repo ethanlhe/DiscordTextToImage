@@ -46,7 +46,12 @@ class Prompt(commands.Cog):
     @commands.command()
     async def sync(self, ctx):
         fmt = await ctx.bot.tree.sync(guild=ctx.guild)
-        await ctx.send(f'Synced {len(fmt)} commands')
+        await ctx.send(f'Synced {len(fmt)} commands in this server')
+    
+    @commands.command()
+    async def global_sync(self, ctx):
+        fmt = await ctx.bot.tree.sync()
+        await ctx.send(f'Synced {len(fmt)} commands globally')
     
     @commands.command()
     async def hi(self, ctx):
