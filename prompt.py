@@ -127,5 +127,6 @@ async def setup(bot):
     await bot.add_cog(Prompt(bot), guilds=[discord.Object(id=975524755098714153), 
                                             discord.Object(id=999419811010453556), 
                                             discord.Object(id=937936836523884566),
-                                            discord.Object(id=812413283738058802)])
+                                            discord.Object(id=812413283738058802),
+                                            discord.Object(id=964374335349473363)])
 
