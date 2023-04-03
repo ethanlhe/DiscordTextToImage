@@ -8,6 +8,7 @@ from PIL import Image
 import time
 import asyncio
 import functools
+from titlecase import titlecase
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
@@ -28,7 +29,7 @@ print("Generator loaded")
 def make_embed(images, image_num, prompt):
     image = Image.fromarray(images[image_num])
     image.save("image.png")
-    embed=discord.Embed(title=f"{prompt} ({image_num+1}/{len(images)})")
+    embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)})")
     new_prompt = ''
     for letter in list(prompt):
         if letter.isalnum() or letter == ' ':
