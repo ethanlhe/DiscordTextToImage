@@ -29,8 +29,12 @@ def make_embed(images, image_num, prompt):
     image = Image.fromarray(images[image_num])
     image.save("image.png")
     embed=discord.Embed(title=f"{prompt} ({image_num+1}/{len(images)})")
-    prompt_space = prompt.replace(' ', '-')
-    filename = f"{prompt_space}-{image_num+1}.png"
+    new_prompt = ''
+    for letter in list(prompt):
+        if letter.isalnum() or letter == ' ':
+            new_prompt += letter
+    prompt_dashes = new_prompt.replace(' ', '-')
+    filename = f"{prompt_dashes}-{image_num+1}.png"
     file = discord.File("image.png", filename=filename)
     embed.set_image(url=f"attachment://{filename}")
     return file, embed
