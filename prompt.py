@@ -64,7 +64,7 @@ class Prompt(commands.Cog):
 
     class Menu(discord.ui.View):
         def __init__(self, images, prompt):
-            super().__init__()
+            super().__init__(timeout=None)
             self.images = images
             self.number = 0
             self.prompt = prompt
