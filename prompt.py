@@ -37,13 +37,11 @@ def make_embed(images, image_num, prompt):
     '''
     image = Image.fromarray(images[image_num])
     image.save("image.png")
+    '''
     filename = f"{prompt_dashes}-{image_num+1}.png"
     file = discord.File("image.png", filename=filename)
     embed.set_image(url=f"attachment://{filename}")
     return file, embed
-    '''
-    return None, embed
-
 class Prompt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
