@@ -27,9 +27,9 @@ with strategy.scope():
 print("Generator loaded")
 '''
 
-def make_embed(images, image_num, prompt):
+def make_embed(images, image_num, prompt, user_id):
     embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)})")
-    embed.set_footer(text='Hello there')
+    embed.set_footer(text=f'Hello there {user_id}')
     new_prompt = ''
     for letter in list(prompt):
         if letter.isalnum() or letter == ' ':
@@ -126,7 +126,7 @@ class Prompt(commands.Cog):
         '''
         images = [1, 2, 3, 4]
         view = self.Menu(images, prompt)
-        file, embed = make_embed(images, 0, prompt)
+        file, embed = make_embed(images, 0, prompt, interaction.user.id)
         await interaction.followup.send(embed=embed, file=file, view=view)
     
     @app_commands.command(name="ping", description="testing if bot responds")
