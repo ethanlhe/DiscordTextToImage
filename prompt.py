@@ -28,8 +28,8 @@ print("Generator loaded")
 '''
 
 def make_embed(images, image_num, prompt, user):
-    embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)}) <@{user.mention}>")
-    embed.set_footer(text=f'Hello there <@{user.mention}>')
+    embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)}) {user.mention}")
+    embed.set_footer(text=f"Hello there {user.mention}")
     new_prompt = ''
     for letter in list(prompt):
         if letter.isalnum() or letter == ' ':
