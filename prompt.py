@@ -12,7 +12,7 @@ from titlecase import titlecase
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
-'''
+
 cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
 strategy = tf.distribute.TPUStrategy(cluster_resolver)
@@ -25,7 +25,6 @@ with strategy.scope():
         img_width=512,
 )
 print("Generator loaded")
-'''
 
 def make_embed(images, image_num, prompt, user):
     embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)})")
@@ -35,10 +34,8 @@ def make_embed(images, image_num, prompt, user):
         if letter.isalnum() or letter == ' ':
             new_prompt += letter
     prompt_dashes = new_prompt.replace(' ', '-')
-    '''
     image = Image.fromarray(images[image_num])
     image.save("image.png")
-    '''
     filename = f"{prompt_dashes}-{image_num+1}.png"
     file = discord.File("image.png", filename=filename)
     embed.set_image(url=f"attachment://{filename}")
@@ -118,12 +115,10 @@ class Prompt(commands.Cog):
         #    await ctx.message.reply("Don't use this bot in DM's, use it in the server please!")
         #    return
         await interaction.response.defer(thinking=True)
-        '''
         loop = asyncio.get_running_loop()
         images = await loop.run_in_executor(None, functools.partial(
             self.gen_images, prompt = prompt
             ))
-        '''
         images = [1, 2, 3, 4]
         view = self.Menu(images, prompt)
         file, embed = make_embed(images, 0, prompt, interaction.user)
