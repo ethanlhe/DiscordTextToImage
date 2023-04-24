@@ -119,7 +119,6 @@ class Prompt(commands.Cog):
         images = await loop.run_in_executor(None, functools.partial(
             self.gen_images, prompt = prompt
             ))
-        images = [1, 2, 3, 4]
         view = self.Menu(images, prompt)
         file, embed = make_embed(images, 0, prompt, interaction.user)
         await interaction.followup.send(embed=embed, file=file, view=view)
