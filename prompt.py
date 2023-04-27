@@ -63,11 +63,12 @@ class Prompt(commands.Cog):
         await ctx.channel.send("hey")
 
     class Menu(discord.ui.View):
-        def __init__(self, images, prompt):
+        def __init__(self, images, prompt, user):
             super().__init__(timeout=None)
             self.images = images
             self.number = 0
             self.prompt = prompt
+            self.user = user
             self.change_button_state("disable", "left")
         
         @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple, custom_id="left")
@@ -76,7 +77,7 @@ class Prompt(commands.Cog):
             if self.number == 0:
                 self.change_button_state("disable", "left")
             self.change_button_state("enable", "right")
-            file, embed = make_embed(self.images, self.number, self.prompt)
+            file, embed = make_embed(self.images, self.number, self.prompt, self.user)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
         @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple, custom_id="right")
@@ -85,7 +86,7 @@ class Prompt(commands.Cog):
             if self.number == len(self.images)-1:
                 self.change_button_state("disable", "right")
             self.change_button_state("enable", "left")
-            file, embed = make_embed(self.images, self.number, self.prompt)
+            file, embed = make_embed(self.images, self.number, self.user)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
         def change_button_state(self, operation, button_id): #operation is "enable" or "disable"
@@ -119,7 +120,7 @@ class Prompt(commands.Cog):
         images = await loop.run_in_executor(None, functools.partial(
             self.gen_images, prompt = prompt
             ))
-        view = self.Menu(images, prompt)
+        view = self.Menu(images, prompt, interaction.user)
         file, embed = make_embed(images, 0, prompt, interaction.user)
         await interaction.followup.send(embed=embed, file=file, view=view)
     
