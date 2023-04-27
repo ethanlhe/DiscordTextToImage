@@ -86,7 +86,7 @@ class Prompt(commands.Cog):
             if self.number == len(self.images)-1:
                 self.change_button_state("disable", "right")
             self.change_button_state("enable", "left")
-            file, embed = make_embed(self.images, self.number, self.user)
+            file, embed = make_embed(self.images, self.number, self.prompt, self.user)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
         def change_button_state(self, operation, button_id): #operation is "enable" or "disable"
