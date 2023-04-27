@@ -1,7 +1,6 @@
 import discord 
 from discord.ext import commands
 import asyncio
-import systemd.daemon
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
@@ -17,6 +16,4 @@ async def main():
     await bot.load_extension('prompt')
 
 asyncio.run(main())
-
-systemd.daemon.notify('READY=1')
 bot.run('MTAxMzIzMjQ5ODI0OTA0Mzk2OQ.GfBz_V.gXxdl_YLck377QnfgjPXnUEiDzBt6j5TL2LJDk')
