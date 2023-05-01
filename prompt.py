@@ -9,6 +9,7 @@ import time
 import asyncio
 import functools
 from titlecase import titlecase
+from transformers import pipeline
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
@@ -17,16 +18,20 @@ cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local'
 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
 strategy = tf.distribute.TPUStrategy(cluster_resolver)
 
-print("TPU's loaded, loading generator")
+print("TPU's loaded, loading image generator")
 
 with strategy.scope(): 
     generator = Text2Image( 
         img_height=512,
         img_width=512,
 )
-print("Generator loaded")
+print("Image Generator loaded")
 
-def make_embed(images, image_num, prompt, user):
+print("Loading Text Generator")
+text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-1.3B')
+print("Loaded Text Generator")
+
+def make_image_embed(images, image_num, prompt, user):
     embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)})")
     embed.set_footer(text=user.display_name, icon_url=user.display_avatar.url)
     new_prompt = ''
@@ -40,6 +45,12 @@ def make_embed(images, image_num, prompt, user):
     file = discord.File("image.png", filename=filename)
     embed.set_image(url=f"attachment://{filename}")
     return file, embed
+
+def make_text_embed(prompt, text, user):
+    embed=discord.Embed(title=prompt, description=text)
+    embed.set_footer(text=user.display_name, icon_url=user.display_avatar.url)
+    return embed
+
 class Prompt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -77,7 +88,7 @@ class Prompt(commands.Cog):
             if self.number == 0:
                 self.change_button_state("disable", "left")
             self.change_button_state("enable", "right")
-            file, embed = make_embed(self.images, self.number, self.prompt, self.user)
+            file, embed = make_image_embed(self.images, self.number, self.prompt, self.user)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
         @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple, custom_id="right")
@@ -86,7 +97,7 @@ class Prompt(commands.Cog):
             if self.number == len(self.images)-1:
                 self.change_button_state("disable", "right")
             self.change_button_state("enable", "left")
-            file, embed = make_embed(self.images, self.number, self.prompt, self.user)
+            file, embed = make_image_embed(self.images, self.number, self.prompt, self.user)
             await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         
         def change_button_state(self, operation, button_id): #operation is "enable" or "disable"
@@ -108,22 +119,34 @@ class Prompt(commands.Cog):
             if numpy.average(img) != 124:
                 good_images.append(img)
         return good_images
-    
-    @app_commands.command(name="prompt", description="enter image prompt")
+        
+    @app_commands.command(name="prompt", description="Enter image prompt")
     async def prompt(self, interaction, prompt: str):
-        #SHIKHAR_ID = 711351178146873344
-        #if not ctx.message.guild and ctx.message.author.id != SHIKHAR_ID:
-        #    await ctx.message.reply("Don't use this bot in DM's, use it in the server please!")
-        #    return
         await interaction.response.defer(thinking=True)
         loop = asyncio.get_running_loop()
         images = await loop.run_in_executor(None, functools.partial(
             self.gen_images, prompt = prompt
             ))
         view = self.Menu(images, prompt, interaction.user)
-        file, embed = make_embed(images, 0, prompt, interaction.user)
+        file, embed = make_image_embed(images, 0, prompt, interaction.user)
         await interaction.followup.send(embed=embed, file=file, view=view)
     
+    def gen_text(self, prompt, length):
+        temperature = .7
+        output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
+        text = output[0]['generated_text']
+        return text
+
+    @app_commands.command(name="text", description="Generates text based on prompt")
+    async def text(self, interaction, prompt: str, length: int = 50):
+        await interaction.response.defer(thinking=True)
+        loop = asyncio.get_running_loop()
+        text = await loop.run_in_executor(None, functools.partial(
+            self.gen_text, prompt=prompt, length=length
+        ))
+        embed = make_text_embed(prompt, text, interaction.user)
+        await interaction.followup.send(embed=embed)
+
     @app_commands.command(name="ping", description="testing if bot responds")
     async def ping(self, interaction):
         await interaction.response.send_message("pong")
