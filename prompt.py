@@ -120,8 +120,8 @@ class Prompt(commands.Cog):
                 good_images.append(img)
         return good_images
         
-    @app_commands.command(name="prompt", description="Enter image prompt")
-    async def prompt(self, interaction, prompt: str):
+    @app_commands.command(name="image", description="Enter image prompt")
+    async def image(self, interaction, prompt: str):
         await interaction.response.defer(thinking=True)
         loop = asyncio.get_running_loop()
         images = await loop.run_in_executor(None, functools.partial(
