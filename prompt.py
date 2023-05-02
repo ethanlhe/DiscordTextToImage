@@ -29,7 +29,7 @@ with strategy.scope():
 print("Image Generator loaded")
 '''
 print("Loading Text Generator")
-text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-1.3B')
+text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-2.7B')
 print("Loaded Text Generator")
 
 def make_image_embed(images, image_num, prompt, user):
