@@ -10,7 +10,7 @@ bot = commands.Bot(command_prefix="/", intents=discord.Intents.all(), applicatio
 @bot.event
 async def on_ready():
     print("Bot is online")
-    await bot.change_presence(activity=discord.Game('/prompt'))
+    await bot.change_presence(activity=discord.Game('/image | /text'))
 
 async def main():
     await bot.load_extension('prompt')
