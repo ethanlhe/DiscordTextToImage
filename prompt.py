@@ -142,9 +142,14 @@ class Prompt(commands.Cog):
     async def text(self, interaction, prompt: str, length: int = 50):
         await interaction.response.defer(thinking=True)
         loop = asyncio.get_running_loop()
-        text = await loop.run_in_executor(None, functools.partial(
-            self.gen_text, prompt=prompt, length=length
-        ))
+        if length < 0:
+            text = "Please give a positive word length!"
+        elif length <= 250:
+            text = await loop.run_in_executor(None, functools.partial(
+                self.gen_text, prompt=prompt, length=length
+            ))
+        else:
+            text = f"You entered {length} words. The max word length is 250 words!"
         embed = make_text_embed(prompt, text, interaction.user)
         await interaction.followup.send(embed=embed)
 
