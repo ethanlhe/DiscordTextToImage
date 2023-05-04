@@ -14,7 +14,6 @@ from transformers import pipeline
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
 
-'''
 cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
 strategy = tf.distribute.TPUStrategy(cluster_resolver)
@@ -27,7 +26,7 @@ with strategy.scope():
         img_width=512,
 )
 print("Image Generator loaded")
-'''
+
 print("Loading Text Generator")
 text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-2.7B')
 print("Loaded Text Generator")
@@ -146,12 +145,12 @@ class Prompt(commands.Cog):
         if length < 0:
             text = f"You entered {length} words. Please give a positive word length!"
             title = "Error"
-        elif length <= 250:
+        elif length <= 200:
             text = await loop.run_in_executor(None, functools.partial(
                 self.gen_text, prompt=prompt, length=length
             ))
         else:
-            text = f"You entered {length} words. The max word length is 250 words!"
+            text = f"You entered {length} words. The max word length is 200 words!"
             title = "Error"
         embed = make_text_embed(title, text, interaction.user)
         await interaction.followup.send(embed=embed)
