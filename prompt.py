@@ -145,12 +145,12 @@ class Prompt(commands.Cog):
         if length < 0:
             text = f"You entered {length} words. Please give a positive word length!"
             title = "Error"
-        elif length <= 200:
+        elif length <= 100:
             text = await loop.run_in_executor(None, functools.partial(
                 self.gen_text, prompt=prompt, length=length
             ))
         else:
-            text = f"You entered {length} words. The max word length is 200 words!"
+            text = f"You entered {length} words. The max word length is 100 words!"
             title = "Error"
         embed = make_text_embed(title, text, interaction.user)
         await interaction.followup.send(embed=embed)
