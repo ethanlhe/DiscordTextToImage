@@ -32,7 +32,7 @@ print("Image Generator loaded")
 '''
 
 print("Loading Text Generator")
-text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-2.7B')
+text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-125M')
 print("Loaded Text Generator")
 
 queue = []
