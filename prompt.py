@@ -1,3 +1,4 @@
+from code import interact
 import discord 
 from discord import app_commands
 from discord.ext import commands
@@ -10,10 +11,12 @@ import asyncio
 import functools
 from titlecase import titlecase
 from transformers import pipeline
+from datetime import datetime
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # no warnings
 
+'''
 cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
 strategy = tf.distribute.TPUStrategy(cluster_resolver)
@@ -26,10 +29,13 @@ with strategy.scope():
         img_width=512,
 )
 print("Image Generator loaded")
+'''
 
 print("Loading Text Generator")
 text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-2.7B')
 print("Loaded Text Generator")
+
+queue = []
 
 def make_image_embed(images, image_num, prompt, user):
     embed=discord.Embed(title=f"{titlecase(prompt)} ({image_num+1}/{len(images)})")
@@ -51,6 +57,21 @@ def make_text_embed(prompt, text, user):
     embed.set_footer(text=user.display_name, icon_url=user.display_avatar.url)
     return embed
 
+def wait_until_position(interaction):
+    queue.append([interaction, datetime.now()])
+    position = 10000
+    while queue[0][0] != interaction:
+        if (datetime.now() - queue[0][1]).total_seconds() > 60:
+            queue.pop(0) 
+        temp_position = 1
+        for temp_interaction, _ in queue:
+            if temp_interaction == interaction:
+                break
+            temp_position += 1
+        if temp_position != position:
+            position = temp_position
+            interaction.response.send_message(f"Queue position: {position}")
+    interaction.response.send_message(f"Queue position: 1")
 class Prompt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -108,7 +129,8 @@ class Prompt(commands.Cog):
                     elif operation == "disable":
                         button.disabled = True    
 
-    def gen_images(self, prompt):   
+    def gen_images(self, prompt, interaction):       
+        wait_until_position(interaction)    
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -118,6 +140,7 @@ class Prompt(commands.Cog):
         for img in images:
             if numpy.average(img) != 124:
                 good_images.append(img)
+        queue.pop(0)
         return good_images
         
     @app_commands.command(name="image", description="Enter image prompt")
@@ -125,16 +148,18 @@ class Prompt(commands.Cog):
         await interaction.response.defer(thinking=True)
         loop = asyncio.get_running_loop()
         images = await loop.run_in_executor(None, functools.partial(
-            self.gen_images, prompt = prompt
+            self.gen_images, prompt = prompt, interaction=interaction
             ))
         view = self.Menu(images, prompt, interaction.user)
         file, embed = make_image_embed(images, 0, prompt, interaction.user)
         await interaction.followup.send(embed=embed, file=file, view=view)
     
-    def gen_text(self, prompt, length):
+    def gen_text(self, prompt, length, interaction):
+        wait_until_position(interaction)    
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
+        queue.pop(0)
         return text
 
     @app_commands.command(name="text", description="Generates text based on prompt")
@@ -147,7 +172,7 @@ class Prompt(commands.Cog):
             title = "Error"
         elif length <= 100:
             text = await loop.run_in_executor(None, functools.partial(
-                self.gen_text, prompt=prompt, length=length
+                self.gen_text, prompt=prompt, length=length, interaction=interaction
             ))
         else:
             text = f"You entered {length} words. The max word length is 100 words!"
