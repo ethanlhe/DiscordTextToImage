@@ -57,7 +57,7 @@ def make_text_embed(prompt, text, user):
     embed.set_footer(text=user.display_name, icon_url=user.display_avatar.url)
     return embed
 
-def wait_until_position(interaction):
+async def wait_until_position(interaction):
     queue.append([interaction, datetime.now()])
     position = 10000
     while queue[0][0] != interaction:
@@ -70,8 +70,8 @@ def wait_until_position(interaction):
             temp_position += 1
         if temp_position != position:
             position = temp_position
-            interaction.response.send_message(f"Queue position: {position}")
-    interaction.response.send_message(f"Queue position: 1")
+            await interaction.response.send_message(f"Queue position: {position}")
+    await interaction.response.send_message(f"Queue position: 1")
 class Prompt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -170,7 +170,7 @@ class Prompt(commands.Cog):
         if length < 0:
             text = f"You entered {length} words. Please give a positive word length!"
             title = "Error"
-        elif length <= 100:
+        elif length <= 1000:
             text = await loop.run_in_executor(None, functools.partial(
                 self.gen_text, prompt=prompt, length=length, interaction=interaction
             ))
