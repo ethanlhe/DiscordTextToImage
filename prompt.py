@@ -114,7 +114,7 @@ class Prompt(commands.Cog):
                     elif operation == "disable":
                         button.disabled = True   
 
-    async def wait_until_position(self, interaction):
+    def wait_until_position(self, interaction):
         queue.append([interaction, datetime.now()])
         print('1', queue)
         position = 10000
