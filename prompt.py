@@ -57,21 +57,6 @@ def make_text_embed(prompt, text, user):
     embed.set_footer(text=user.display_name, icon_url=user.display_avatar.url)
     return embed
 
-async def wait_until_position(interaction):
-    queue.append([interaction, datetime.now()])
-    position = 10000
-    while queue[0][0] != interaction:
-        if (datetime.now() - queue[0][1]).total_seconds() > 60:
-            queue.pop(0) 
-        temp_position = 1
-        for temp_interaction, _ in queue:
-            if temp_interaction == interaction:
-                break
-            temp_position += 1
-        if temp_position != position:
-            position = temp_position
-            await interaction.response.send_message(f"Queue position: {position}")
-    await interaction.response.send_message(f"Queue position: 1")
 class Prompt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -127,10 +112,26 @@ class Prompt(commands.Cog):
                     if operation == "enable":
                         button.disabled = False
                     elif operation == "disable":
-                        button.disabled = True    
+                        button.disabled = True   
+
+    async def wait_until_position(interaction):
+        queue.append([interaction, datetime.now()])
+        position = 10000
+        while queue[0][0] != interaction:
+            if (datetime.now() - queue[0][1]).total_seconds() > 60:
+                queue.pop(0) 
+            temp_position = 1
+            for temp_interaction, _ in queue:
+                if temp_interaction == interaction:
+                    break
+                temp_position += 1
+            if temp_position != position:
+                position = temp_position
+                await interaction.response.send_message(f"Queue position: {position}")
+        await interaction.response.send_message(f"Queue position: 1")
 
     def gen_images(self, prompt, interaction):       
-        wait_until_position(interaction)    
+        #self.wait_until_position(interaction)    
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -155,7 +156,7 @@ class Prompt(commands.Cog):
         await interaction.followup.send(embed=embed, file=file, view=view)
     
     def gen_text(self, prompt, length, interaction):
-        wait_until_position(interaction)    
+        #self.wait_until_position(interaction)    
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
@@ -165,12 +166,15 @@ class Prompt(commands.Cog):
     @app_commands.command(name="text", description="Generates text based on prompt")
     async def text(self, interaction, prompt: str, length: int = 50):
         await interaction.response.defer(thinking=True)
-        loop = asyncio.get_running_loop()
         title = prompt
         if length < 0:
             text = f"You entered {length} words. Please give a positive word length!"
             title = "Error"
         elif length <= 1000:
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, functools.partial(
+                self.wait_until_position, interaction=interaction
+            ))
             text = await loop.run_in_executor(None, functools.partial(
                 self.gen_text, prompt=prompt, length=length, interaction=interaction
             ))
