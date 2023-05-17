@@ -112,7 +112,10 @@ class Prompt(commands.Cog):
                     if operation == "enable":
                         button.disabled = False
                     elif operation == "disable":
-                        button.disabled = True   
+                        button.disabled = True  
+
+    async def send_interaction_message(interaction, message):
+        await interaction.response.send_message(message)
 
     def wait_until_position(self, interaction):
         queue.append([interaction, datetime.now()])
@@ -128,11 +131,11 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                asyncio.create_task(interaction.response.send_message(f"Queue position: {position}"))
-        asyncio.create_task(interaction.response.send_message(f"Queue position: 1"))
+                asyncio.run(self.send_interaction_message(interaction, f"Queue position: {position}"))
+        asyncio.run(self.send_interaction_message(interaction, "Queue position: 1"))
 
     def gen_images(self, prompt, interaction):       
-        #self.wait_until_position(interaction)    
+        self.wait_until_position(interaction)    
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -157,7 +160,7 @@ class Prompt(commands.Cog):
         await interaction.followup.send(embed=embed, file=file, view=view)
     
     def gen_text(self, prompt, length, interaction):
-        #self.wait_until_position(interaction)    
+        self.wait_until_position(interaction)    
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
@@ -174,9 +177,6 @@ class Prompt(commands.Cog):
             title = "Error"
         elif length <= 1000:
             loop = asyncio.get_running_loop()
-            await loop.run_in_executor(None, functools.partial(
-                self.wait_until_position, interaction=interaction
-            ))
             text = await loop.run_in_executor(None, functools.partial(
                 self.gen_text, prompt=prompt, length=length, interaction=interaction
             ))
