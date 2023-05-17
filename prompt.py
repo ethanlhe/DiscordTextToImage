@@ -128,8 +128,8 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                interaction.response.send_message(f"Queue position: {position}")
-        interaction.response.send_message(f"Queue position: 1")
+                asyncio.create_task(interaction.response.send_message(f"Queue position: {position}"))
+        asyncio.create_task(interaction.response.send_message(f"Queue position: 1"))
 
     def gen_images(self, prompt, interaction):       
         #self.wait_until_position(interaction)    
