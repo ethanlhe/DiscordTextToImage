@@ -114,7 +114,7 @@ class Prompt(commands.Cog):
                     elif operation == "disable":
                         button.disabled = True  
 
-    async def send_interaction_message(interaction, message):
+    async def send_interaction_message(self, interaction, message):
         await interaction.response.send_message(message)
 
     def wait_until_position(self, interaction):
