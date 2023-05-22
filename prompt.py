@@ -132,6 +132,8 @@ class Prompt(commands.Cog):
             if temp_position != position:
                 position = temp_position
                 asyncio.run(self.send_interaction_message(interaction, f"Queue position: {position}"))
+        loop = asyncio.get_running_loop() 
+        print(loop)
         asyncio.run(self.send_interaction_message(interaction, "Queue position: 1"))
 
     def gen_images(self, prompt, interaction):       
