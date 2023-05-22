@@ -115,7 +115,7 @@ class Prompt(commands.Cog):
                         button.disabled = True  
 
     async def send_interaction_message(self, interaction, message):
-        await interaction.response.send_message(message)
+        await interaction.followup.send(message)
 
     def wait_until_position(self, interaction):
         queue.append([interaction, datetime.now()])
