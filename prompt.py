@@ -112,12 +112,9 @@ class Prompt(commands.Cog):
                     if operation == "enable":
                         button.disabled = False
                     elif operation == "disable":
-                        button.disabled = True  
+                        button.disabled = True   
 
-    async def send_interaction_message(self, interaction, message):
-        await interaction.followup.send(message)
-
-    def wait_until_position(self, interaction, loop):
+    def wait_until_position(self, interaction):
         queue.append([interaction, datetime.now()])
         print('1', queue)
         position = 10000
@@ -131,15 +128,11 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                asyncio.run(self.send_interaction_message(interaction, f"Queue position: {position}"))
-        print(loop)
-        loop.run_in_executor(None, functools.partial(
-            self.send_interaction_message, interaction = interaction, message="Queue position: 1"
-            ))
-        #asyncio.run(self.send_interaction_message(interaction, "Queue position: 1"))
+                print("Queue position:", interaction.message.content, position)
+        print("Queue position:", interaction.message.content, 1)
 
     def gen_images(self, prompt, interaction):       
-        self.wait_until_position(interaction)    
+        #self.wait_until_position(interaction)    
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -163,8 +156,8 @@ class Prompt(commands.Cog):
         file, embed = make_image_embed(images, 0, prompt, interaction.user)
         await interaction.followup.send(embed=embed, file=file, view=view)
     
-    def gen_text(self, prompt, length, interaction, loop):
-        self.wait_until_position(interaction, loop)    
+    def gen_text(self, prompt, length, interaction):
+        self.wait_until_position(interaction)    
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
@@ -182,7 +175,7 @@ class Prompt(commands.Cog):
         elif length <= 1000:
             loop = asyncio.get_running_loop()
             text = await loop.run_in_executor(None, functools.partial(
-                self.gen_text, prompt=prompt, length=length, interaction=interaction, loop=loop
+                self.gen_text, prompt=prompt, length=length, interaction=interaction
             ))
         else:
             text = f"You entered {length} words. The max word length is 100 words!"
