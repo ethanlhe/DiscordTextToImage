@@ -116,7 +116,6 @@ class Prompt(commands.Cog):
 
     def wait_until_position(self, interaction):
         queue.append([interaction, datetime.now()])
-        print('1', queue)
         position = 10000
         while queue[0][0] != interaction:
             if (datetime.now() - queue[0][1]).total_seconds() > 60:
@@ -161,7 +160,6 @@ class Prompt(commands.Cog):
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
-        print('2', queue)
         queue.pop(0)
         return text
 
