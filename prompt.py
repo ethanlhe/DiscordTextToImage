@@ -128,8 +128,8 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                print("Queue position:", interaction.message.content, position)
-        print("Queue position:", interaction.message.content, 1)
+                print("Queue position:", interaction, position)
+        print("Queue position:", interaction, 1)
 
     def gen_images(self, prompt, interaction):       
         #self.wait_until_position(interaction)    
