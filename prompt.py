@@ -127,7 +127,7 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                print("Queue position:", [param.locale_name for param in interaction.command.parameters], position)
+                print("Queue position:", interaction.command.qualified_name, position)
         print("Queue position:", [param.locale_name for param in interaction.command.parameters], 1)
 
     def gen_images(self, prompt, interaction):       
