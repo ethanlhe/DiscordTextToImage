@@ -114,7 +114,7 @@ class Prompt(commands.Cog):
                     elif operation == "disable":
                         button.disabled = True   
 
-    def wait_until_position(self, interaction):
+    def wait_until_position(self, interaction, info):
         queue.append([interaction, datetime.now()])
         position = 10000
         while queue[0][0] != interaction:
@@ -127,11 +127,11 @@ class Prompt(commands.Cog):
                 temp_position += 1
             if temp_position != position:
                 position = temp_position
-                print("Queue position:", [param.locale_description for param in interaction.command.parameters], position)
-        print("Queue position:", interaction.command.description, 1)
+                print("Queue position:", info, position)
+        print("Queue position:", info, 1)
 
     def gen_images(self, prompt, interaction):       
-        #self.wait_until_position(interaction)    
+        self.wait_until_position(interaction, [prompt])    
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -156,7 +156,7 @@ class Prompt(commands.Cog):
         await interaction.followup.send(embed=embed, file=file, view=view)
     
     def gen_text(self, prompt, length, interaction):
-        self.wait_until_position(interaction)    
+        self.wait_until_position(interaction, [prompt, length])    
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
