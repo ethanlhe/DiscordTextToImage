@@ -119,7 +119,9 @@ class Prompt(commands.Cog):
         position = 10000
         while queue[0][0] != interaction:
             if (datetime.now() - queue[0][1]).total_seconds() > 60:
+                print('Minute passed timeout')
                 queue.pop(0) 
+
             temp_position = 1
             for temp_interaction, _ in queue:
                 if temp_interaction == interaction:
@@ -156,7 +158,8 @@ class Prompt(commands.Cog):
         await interaction.followup.send(embed=embed, file=file, view=view)
     
     def gen_text(self, prompt, length, interaction):
-        self.wait_until_position(interaction, [prompt, length])    
+        self.wait_until_position(interaction, [prompt, length])  
+        print("Generating", prompt, length)
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
