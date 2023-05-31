@@ -116,6 +116,7 @@ class Prompt(commands.Cog):
 
     def wait_until_position(self, interaction, info):
         queue.append([interaction, datetime.now()])
+        print(queue)
         position = 10000
         while queue[0][0] != interaction:
             if (datetime.now() - queue[0][1]).total_seconds() > 60:
