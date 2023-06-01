@@ -119,7 +119,6 @@ class Prompt(commands.Cog):
         print(queue)
         position = 10000
         while queue[0][0] != interaction:
-            print(queue[0][0], interaction)
             if (datetime.now() - queue[0][1]).total_seconds() > 60:
                 print('Minute passed timeout')
                 queue.pop(0) 
