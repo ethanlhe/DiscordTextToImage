@@ -119,7 +119,7 @@ class Prompt(commands.Cog):
         print(queue)
         position = 10000
         while queue[0][0] != interaction:
-            if (datetime.now() - queue[0][1]).total_seconds() > 60:
+            if (datetime.now() - queue[0][1]).total_seconds() > 60 and position == 1:
                 print('Minute passed timeout')
                 queue.pop(0) 
 
@@ -144,7 +144,8 @@ class Prompt(commands.Cog):
         for img in images:
             if numpy.average(img) != 124:
                 good_images.append(img)
-        queue.pop(0)
+        if len(queue) > 0 and queue[0][0] == interaction:
+            queue.pop(0)
         return good_images
         
     @app_commands.command(name="image", description="Enter image prompt")
@@ -164,7 +165,8 @@ class Prompt(commands.Cog):
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
-        queue.pop(0)
+        if len(queue) > 0 and queue[0][0] == interaction:
+            queue.pop(0)
         return text
 
     @app_commands.command(name="text", description="Generates text based on prompt")
