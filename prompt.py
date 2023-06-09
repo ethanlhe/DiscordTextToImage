@@ -32,7 +32,7 @@ print("Image Generator loaded")
 '''
 
 print("Loading Text Generator")
-text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-125M')
+text_generator = pipeline('text-generation', model='EleutherAI/gpt-neo-2.7B')
 print("Loaded Text Generator")
 
 queue = []
@@ -135,7 +135,8 @@ class Prompt(commands.Cog):
         print("Queue position:", info, 1)
 
     def gen_images(self, prompt, interaction):       
-        self.wait_until_position(interaction, [prompt])    
+        self.wait_until_position(interaction, [prompt]) 
+        print("Generating image", prompt)   
         images = generator.generate(
             prompt,
             num_steps=50,
@@ -162,7 +163,7 @@ class Prompt(commands.Cog):
     
     def gen_text(self, prompt, length, interaction):
         self.wait_until_position(interaction, [prompt, length])  
-        print("Generating", prompt, length)
+        print("Generating text", prompt, length)
         temperature = .7
         output = text_generator(prompt, do_sample=True, min_length=length, max_length=length, temperature=temperature)
         text = output[0]['generated_text']
