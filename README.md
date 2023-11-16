@@ -36,4 +36,4 @@ Project Link: [https://github.com/yourusername/discord-text-to-image-bot](https:
 
 ---
 
-⭐️ From [your_username](https://github.com/yourusername) with ❤️
+⭐️ From ethanlhe(https://github.com/ethanlhe) with ❤️
